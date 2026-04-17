@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferramentas de IA para Startups</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f5f5f3; --bg3: #eeede8;
+    --text: #1a1a18; --text2: #6b6b67; --text3: #9b9b97;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
+    --purple: #534AB7; --purple-light: #EEEDFE; --purple-mid: #AFA9EC;
+    --green: #3B6D11; --green-light: #EAF3DE; --green-mid: #C0DD97;
+    --radius: 10px; --radius-lg: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg2: #252523; --bg3: #2e2e2c;
+      --text: #f0efea; --text2: #a0a09c; --text3: #70706c;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+      --purple-light: #26215C; --purple-mid: #534AB7;
+      --green-light: #173404; --green-mid: #3B6D11;
+    }
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
+  header { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 2rem 1.5rem 1.5rem; text-align: center; }
+  header h1 { font-size: 24px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+  header p { font-size: 14px; color: var(--text2); }
+  .main { max-width: 860px; margin: 0 auto; padding: 1.5rem; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.2rem; align-items: center; background: var(--bg); border-radius: var(--radius-lg); padding: 1rem; border: 0.5px solid var(--border); }
+  .filter-label { font-size: 12px; color: var(--text2); width: 100%; margin-bottom: 2px; }
+  .filter-btn { font-size: 12px; padding: 5px 13px; border-radius: 20px; border: 0.5px solid var(--border2); background: var(--bg); color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .filter-btn:hover { background: var(--bg2); }
+  .filter-btn.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .search-box { padding: 6px 12px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); font-size: 13px; width: 200px; outline: none; margin-left: auto; }
+  .search-box:focus { border-color: var(--purple); }
+  .stats { display: flex; gap: 10px; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .stat-card { background: var(--bg); border-radius: var(--radius); padding: 10px 16px; flex: 1; min-width: 100px; border: 0.5px solid var(--border); }
+  .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-value { font-size: 22px; font-weight: 500; color: var(--text); }
+  .cards-grid { display: flex; flex-direction: column; gap: 10px; }
+  .tool-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; cursor: pointer; transition: border-color 0.15s; }
+  .tool-card:hover { border-color: var(--border2); }
+  .tool-card.expanded { border-color: var(--purple); }
+  .card-header { display: flex; align-items: center; gap: 12px; }
+  .tool-icon { width: 40px; height: 40px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .card-main { flex: 1; min-width: 0; }
+  .card-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 3px; }
+  .tool-name { font-size: 15px; font-weight: 500; color: var(--text); }
+  .sector-badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; border: 0.5px solid var(--border); color: var(--text2); white-space: nowrap; }
+  .tool-desc-short { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .card-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .student-badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; white-space: nowrap; font-weight: 500; }
+  .student-yes { background: var(--green-light); color: var(--green); border: 0.5px solid var(--green-mid); }
+  .student-no { background: var(--bg2); color: var(--text2); border: 0.5px solid var(--border); }
+  .expand-btn { font-size: 13px; color: var(--text2); border: none; background: none; cursor: pointer; padding: 2px 6px; }
+  .card-detail { margin-top: 1rem; padding-top: 1rem; border-top: 0.5px solid var(--border); display: none; }
+  .card-detail.open { display: block; }
+  .detail-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text2); margin-bottom: 4px; margin-top: 12px; }
+  .detail-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+  @media(max-width:600px){ .detail-grid { grid-template-columns: 1fr; } .card-actions { flex-direction: column; align-items: flex-end; } }
+  .student-detail { font-size: 13px; line-height: 1.5; }
+  .student-detail.yes { color: var(--green); }
+  .student-detail.no { color: var(--text2); }
+  .site-link { display: inline-block; font-size: 12px; padding: 5px 12px; border-radius: var(--radius); background: var(--purple-light); color: var(--purple); border: 0.5px solid var(--purple-mid); text-decoration: none; margin-top: 12px; margin-right: 8px; }
+  .tutorial-link { display: inline-block; font-size: 12px; padding: 5px 12px; border-radius: var(--radius); background: var(--bg2); color: var(--text2); border: 0.5px solid var(--border); text-decoration: none; margin-right: 6px; margin-bottom: 6px; }
+  .tutorial-link:hover { border-color: var(--border2); color: var(--text); }
+  .no-results { text-align: center; padding: 2rem; color: var(--text2); font-size: 14px; }
+  .hidden { display: none !important; }
+  footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--text3); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ferramentas de IA para Startups</h1>
+  <p>15 ferramentas essenciais para empreendedores de IA — com foco em descontos para estudantes</p>
+</header>
+<div class="main">
+  <div class="filters">
+    <span class="filter-label">Filtrar por setor:</span>
+    <button class="filter-btn active" onclick="filterSector('all',this)">Todos</button>
+    <button class="filter-btn" onclick="filterSector('IA / Produtividade',this)">IA / Produtividade</button>
+    <button class="filter-btn" onclick="filterSector('Desenvolvimento',this)">Desenvolvimento</button>
+    <button class="filter-btn" onclick="filterSector('Design / UX',this)">Design / UX</button>
+    <button class="filter-btn" onclick="filterSector('Marketing / CRM',this)">Marketing / CRM</button>
+    <button class="filter-btn" onclick="filterSector('Automação',this)">Automação</button>
+    <button class="filter-btn" onclick="filterSector('Pesquisa',this)">Pesquisa</button>
+    <button class="filter-btn student-filter" onclick="filterStudent(this)">Só desconto estudante</button>
+    <input class="search-box" placeholder="Buscar..." oninput="filterSearch(this.value)" />
+  </div>
+  <div class="stats">
+    <div class="stat-card"><div class="stat-label">Ferramentas</div><div class="stat-value" id="total-count">15</div></div>
+    <div class="stat-card"><div class="stat-label">Desconto estudante</div><div class="stat-value" id="student-count">10</div></div>
+    <div class="stat-card"><div class="stat-label">Plano gratuito</div><div class="stat-value" id="free-count">12</div></div>
+  </div>
+  <div class="cards-grid" id="cards-container"></div>
+  <div class="no-results hidden" id="no-results">Nenhuma ferramenta encontrada.</div>
+</div>
+<footer>Atualizado em abril de 2026 · Para estudantes empreendedores de IA</footer>
+<script>
+const tools=[{name:"ChatGPT",icon:"💬",iconBg:"#E6F1FB",sector:"IA / Produtividade",shortDesc:"Assistente de IA para texto, código, análise e brainstorming.",fullDesc:"O ChatGPT (OpenAI) é o assistente de IA mais usado no mundo. Para startups de IA, serve como co-fundador virtual: redige pitches, gera código, cria estratégias de produto, analisa dados, responde dúvidas técnicas e ajuda na criação de conteúdo. O modelo GPT-4o combina texto, imagem e voz numa única interface.",student:true,studentDetail:"2 meses de ChatGPT Plus gratuitos para estudantes com verificação de status acadêmico. Acesse via studentai.io ou pelo site oficial.",site:"https://chat.openai.com",tutorials:[{label:"Tutorial completo ChatGPT",url:"https://www.youtube.com/results?search_query=chatgpt+tutorial+completo+2025+português"},{label:"ChatGPT para startups",url:"https://www.youtube.com/results?search_query=chatgpt+para+startups+empreendedores"}]},{name:"Claude (Anthropic)",icon:"✦",iconBg:"#FAEEDA",sector:"IA / Produtividade",shortDesc:"IA para escrita longa, análise de documentos e código.",fullDesc:"Claude é o modelo da Anthropic, referência em escrita detalhada, análise de documentos extensos, raciocínio e código. Para empreendedores de IA, se destaca na revisão de contratos, elaboração de documentos técnicos, análise de PDFs de pesquisa e como base de APIs para construir produtos.",student:false,studentDetail:"Não possui plano estudante dedicado. O plano gratuito inclui acesso ao Claude Sonnet 4.6. Startups podem requisitar créditos de API via Anthropic for Startups.",site:"https://claude.ai",tutorials:[{label:"Tutorial Claude AI",url:"https://www.youtube.com/results?search_query=claude+anthropic+tutorial+portugues"},{label:"Claude para negócios",url:"https://www.youtube.com/results?search_query=claude+ai+business+use+cases"}]},{name:"Perplexity AI",icon:"🔍",iconBg:"#E1F5EE",sector:"Pesquisa",shortDesc:"Motor de busca com IA que cita fontes em tempo real.",fullDesc:"O Perplexity é um motor de busca inteligente que responde perguntas complexas com fontes verificadas e em tempo real. Para startups de IA é essencial para pesquisa de mercado, análise de concorrentes, monitoramento de tendências tecnológicas e validação de hipóteses.",student:true,studentDetail:"12 meses de Perplexity Pro GRATUITOS para estudantes com e-mail acadêmico (.edu, .ac ou equivalente). Sem cartão de crédito. Após 12 meses, rebaixa automaticamente para o plano gratuito.",site:"https://www.perplexity.ai/students",tutorials:[{label:"Perplexity tutorial",url:"https://www.youtube.com/results?search_query=perplexity+ai+tutorial+português"},{label:"Pesquisa com Perplexity Pro",url:"https://www.youtube.com/results?search_query=perplexity+pro+research+guide"}]},{name:"GitHub Copilot",icon:"⌨",iconBg:"#E6F1FB",sector:"Desenvolvimento",shortDesc:"IA para autocompletar e gerar código direto no editor.",fullDesc:"GitHub Copilot é o assistente de código da Microsoft/GitHub, integrado ao VS Code e outros IDEs. Sugere linhas, funções e blocos de código com base no contexto. Fundamental para acelerar o desenvolvimento de MVPs, integrar APIs, escrever testes e documentar código.",student:true,studentDetail:"GitHub Copilot GRATUITO para estudantes pelo GitHub Student Developer Pack. Acesse education.github.com e verifique com e-mail estudantil ou documentação acadêmica.",site:"https://education.github.com/pack",tutorials:[{label:"GitHub Copilot iniciantes",url:"https://www.youtube.com/results?search_query=github+copilot+tutorial+português+iniciantes"},{label:"Copilot para startups",url:"https://www.youtube.com/results?search_query=github+copilot+startup+development"}]},{name:"Notion AI",icon:"📋",iconBg:"#E1F5EE",sector:"IA / Produtividade",shortDesc:"Workspace all-in-one com IA para organização e gestão.",fullDesc:"Notion é o hub central de operações de qualquer startup: documenta processos, gerencia roadmap de produto, registra OKRs, centraliza notas de reunião e wikis internos. O Notion AI responde perguntas sobre seus documentos, resume conteúdo e gera rascunhos automaticamente.",student:true,studentDetail:"Notion Plus com 50% de desconto para estudantes e educadores com e-mail acadêmico. O plano Plus inclui uploads maiores, histórico ilimitado e IA básica.",site:"https://www.notion.so/students",tutorials:[{label:"Notion para startups",url:"https://www.youtube.com/results?search_query=notion+para+startups+tutorial+português"},{label:"Notion AI tutorial",url:"https://www.youtube.com/results?search_query=notion+ai+tutorial+2025"}]},{name:"Figma",icon:"✏",iconBg:"#FBEAF0",sector:"Design / UX",shortDesc:"Design colaborativo para UI/UX, protótipos e wireframes.",fullDesc:"Figma é a principal ferramenta de design para startups. Permite criar interfaces, wireframes, protótipos interativos e sistemas de design colaborativos em tempo real. Crucial para validar a experiência do usuário antes de desenvolver e criar pitches visualmente impactantes.",student:true,studentDetail:"Plano Professional GRATUITO para estudantes e educadores. Inclui arquivos ilimitados, histórico de versões e FigJam. Verificação via figma.com/education com e-mail acadêmico. Válido por 2 anos, renovável.",site:"https://www.figma.com/education",tutorials:[{label:"Figma do zero",url:"https://www.youtube.com/results?search_query=figma+tutorial+do+zero+português"},{label:"Figma para startups",url:"https://www.youtube.com/results?search_query=figma+startup+product+design+tutorial"}]},{name:"Canva",icon:"🎨",iconBg:"#FAECE7",sector:"Design / UX",shortDesc:"Design gráfico com IA para marketing, pitch decks e social.",fullDesc:"Canva democratiza o design profissional com templates prontos e IA generativa. Para startups é essencial na criação de pitch decks, posts em redes sociais, apresentações para investidores e identidade visual. O Magic Studio gera imagens, remove fundos e redimensiona layouts automaticamente.",student:true,studentDetail:"Canva Education GRATUITO para K-12. Universitários têm acesso via parcerias institucionais (Canva for Campus). Verifique se sua universidade tem licença. O plano gratuito já inclui muitos recursos.",site:"https://www.canva.com/education",tutorials:[{label:"Canva tutorial completo",url:"https://www.youtube.com/results?search_query=canva+tutorial+completo+português+2025"},{label:"Canva pitch deck startup",url:"https://www.youtube.com/results?search_query=canva+pitch+deck+startup+template"}]},{name:"Vercel",icon:"▲",iconBg:"#F1EFE8",sector:"Desenvolvimento",shortDesc:"Deploy e hospedagem de aplicações web com IA integrada.",fullDesc:"Vercel é a plataforma preferida para hospedar e fazer deploy de aplicações web modernas. Permite publicar MVPs em minutos com CDN global, CI/CD automático e preview de branches. Integra com GitHub para deploy automático a cada commit. Com suporte nativo a Next.js e edge functions.",student:true,studentDetail:"Plano Hobby GRATUITO permanentemente para projetos pessoais (inclui CI/CD e CDN global). Disponível também via GitHub Student Developer Pack com benefícios adicionais.",site:"https://vercel.com",tutorials:[{label:"Deploy com Vercel",url:"https://www.youtube.com/results?search_query=vercel+deploy+tutorial+português"},{label:"Next.js + Vercel startup",url:"https://www.youtube.com/results?search_query=nextjs+vercel+startup+deploy"}]},{name:"HubSpot",icon:"📊",iconBg:"#FAEEDA",sector:"Marketing / CRM",shortDesc:"CRM com IA para vendas, marketing e atendimento ao cliente.",fullDesc:"HubSpot é o CRM mais adotado por startups, reunindo marketing, vendas e suporte numa plataforma com IA. Para empreendedores de IA oferece automação de e-mail, gestão de pipeline de vendas, landing pages, chatbots e análise de leads.",student:false,studentDetail:"Não possui desconto estudante direto. O HubSpot for Startups oferece até 90% de desconto para startups em aceleradoras parceiras e até 30% para startups independentes. O CRM gratuito é robusto para os estágios iniciais.",site:"https://www.hubspot.com/startups",tutorials:[{label:"HubSpot tutorial português",url:"https://www.youtube.com/results?search_query=hubspot+tutorial+português+iniciante"},{label:"HubSpot para startups",url:"https://www.youtube.com/results?search_query=hubspot+for+startups+crm+setup"}]},{name:"Zapier",icon:"⚡",iconBg:"#FAECE7",sector:"Automação",shortDesc:"Automação no-code para integrar ferramentas e fluxos.",fullDesc:"Zapier conecta mais de 7.000 aplicativos sem código, automatizando fluxos repetitivos. Para startups de IA é essencial para conectar CRM com e-mail, enviar notificações automáticas, sincronizar dados entre plataformas e criar pipelines sem contratar um desenvolvedor.",student:false,studentDetail:"Não possui desconto estudante. O plano gratuito permite 100 tarefas/mês com até 2 passos por Zap. Desconto de 33% para pagamento anual. Startups podem buscar créditos via programas de aceleradoras.",site:"https://zapier.com",tutorials:[{label:"Zapier do zero",url:"https://www.youtube.com/results?search_query=zapier+tutorial+do+zero+português"},{label:"Zapier com IA",url:"https://www.youtube.com/results?search_query=zapier+ai+automation+tutorial+2025"}]},{name:"Midjourney",icon:"🖼",iconBg:"#E1F5EE",sector:"Design / UX",shortDesc:"Geração de imagens por IA para branding e marketing visual.",fullDesc:"Midjourney é a principal ferramenta de geração de imagens por IA, criando visuais de alta qualidade a partir de descrições de texto. Útil para criar conceitos de produto, mockups, imagens para pitch decks e materiais de marketing sem contratar um designer.",student:false,studentDetail:"Não possui plano estudante. Plano básico a partir de ~$10/mês. Plano gratuito limitado disponível via Discord.",site:"https://www.midjourney.com",tutorials:[{label:"Midjourney tutorial",url:"https://www.youtube.com/results?search_query=midjourney+tutorial+português+iniciante"},{label:"Midjourney para branding",url:"https://www.youtube.com/results?search_query=midjourney+branding+startup+product"}]},{name:"Cursor",icon:"⬡",iconBg:"#EEEDFE",sector:"Desenvolvimento",shortDesc:"Editor de código com IA que escreve, refatora e explica código.",fullDesc:"Cursor é um fork do VS Code com IA nativa extremamente poderosa. Permite que o modelo escreva código completo com base em descrições, refatore automaticamente, explique trechos complexos, gere testes e corrija bugs. O ambiente de desenvolvimento mais produtivo para fundadores técnicos de startups de IA.",student:true,studentDetail:"Cursor Pro GRATUITO para estudantes universitários verificados. Inclui acesso completo com chamadas ilimitadas. Verificação via e-mail acadêmico em cursor.com/students.",site:"https://cursor.com/students",tutorials:[{label:"Cursor AI tutorial",url:"https://www.youtube.com/results?search_query=cursor+ai+editor+tutorial+português"},{label:"Cursor para startups",url:"https://www.youtube.com/results?search_query=cursor+ai+build+startup+app"}]},{name:"Make (Integromat)",icon:"🔄",iconBg:"#EAF3DE",sector:"Automação",shortDesc:"Automação visual avançada de fluxos e integrações.",fullDesc:"Make é uma plataforma de automação visual mais avançada que o Zapier, com lógica condicional, loops e transformação de dados. Permite criar pipelines de dados complexos, automatizar workflows de geração de conteúdo com IA, integrar webhooks e APIs sem código.",student:false,studentDetail:"Não possui desconto estudante. O plano gratuito inclui 1.000 operações/mês, suficiente para começar. Ótima alternativa ao Zapier para fluxos mais complexos.",site:"https://www.make.com",tutorials:[{label:"Make.com tutorial",url:"https://www.youtube.com/results?search_query=make.com+tutorial+português+automação"},{label:"Make + OpenAI automation",url:"https://www.youtube.com/results?search_query=make+integromat+openai+automation+tutorial"}]},{name:"Supabase",icon:"⬡",iconBg:"#E1F5EE",sector:"Desenvolvimento",shortDesc:"Backend open-source com banco de dados, auth e storage.",fullDesc:"Supabase é o backend como serviço favorito de startups de IA, oferecendo banco de dados PostgreSQL, autenticação, storage e funções serverless. Com suporte a embeddings vetoriais (pgvector), é ideal para aplicações de IA que necessitam busca semântica.",student:true,studentDetail:"Disponível via GitHub Student Developer Pack com créditos adicionais. O plano gratuito já é generoso para projetos iniciais (500MB de banco, 1GB de storage).",site:"https://supabase.com",tutorials:[{label:"Supabase tutorial",url:"https://www.youtube.com/results?search_query=supabase+tutorial+português+2025"},{label:"Supabase + IA",url:"https://www.youtube.com/results?search_query=supabase+ai+application+tutorial"}]},{name:"Loom",icon:"🎬",iconBg:"#FBEAF0",sector:"IA / Produtividade",shortDesc:"Gravação de vídeo assíncrona para demos e comunicação.",fullDesc:"Loom é uma ferramenta de gravação de tela e câmera para comunicação assíncrona. Essencial para criar demos de produto, tutoriais para clientes, atualizações para investidores e onboarding de usuários. Transcreve automaticamente e cria resumos com IA.",student:true,studentDetail:"Loom oferece plano Education GRATUITO para estudantes e professores verificados com e-mail acadêmico. Inclui gravações ilimitadas sem marca d'água.",site:"https://www.loom.com/education",tutorials:[{label:"Loom para startups",url:"https://www.youtube.com/results?search_query=loom+tutorial+startup+demo+video"},{label:"Loom tutorial completo",url:"https://www.youtube.com/results?search_query=loom+tutorial+completo+português"}]}];
+let activeSector='all',studentOnly=false,searchQuery='';
+function renderCards(){
+  const container=document.getElementById('cards-container');
+  const noResults=document.getElementById('no-results');
+  let filtered=tools.filter(t=>{
+    if(activeSector!=='all'&&t.sector!==activeSector)return false;
+    if(studentOnly&&!t.student)return false;
+    if(searchQuery&&!t.name.toLowerCase().includes(searchQuery)&&!t.fullDesc.toLowerCase().includes(searchQuery)&&!t.sector.toLowerCase().includes(searchQuery))return false;
+    return true;
+  });
+  document.getElementById('total-count').textContent=filtered.length;
+  document.getElementById('student-count').textContent=filtered.filter(t=>t.student).length;
+  document.getElementById('free-count').textContent=filtered.filter(t=>t.student||['Vercel','Supabase','Make (Integromat)'].includes(t.name)).length;
+  container.innerHTML='';
+  if(filtered.length===0){noResults.classList.remove('hidden');return;}
+  noResults.classList.add('hidden');
+  filtered.forEach(tool=>{
+    const card=document.createElement('div');
+    card.className='tool-card';
+    card.innerHTML=`<div class="card-header" onclick="toggleCard(this)">
+      <div class="tool-icon" style="background:${tool.iconBg}">${tool.icon}</div>
+      <div class="card-main">
+        <div class="card-top"><span class="tool-name">${tool.name}</span><span class="sector-badge">${tool.sector}</span></div>
+        <div class="tool-desc-short">${tool.shortDesc}</div>
+      </div>
+      <div class="card-actions">
+        <span class="student-badge ${tool.student?'student-yes':'student-no'}">${tool.student?'✓ Desconto estudante':'Sem desconto'}</span>
+        <button class="expand-btn">▼</button>
+      </div>
+    </div>
+    <div class="card-detail">
+      <div class="detail-label">Descrição completa</div>
+      <div class="detail-text">${tool.fullDesc}</div>
+      <div class="detail-grid">
+        <div>
+          <div class="detail-label">Desconto para estudante</div>
+          <div class="student-detail ${tool.student?'yes':'no'}">${tool.studentDetail}</div>
+        </div>
+        <div>
+          <div class="detail-label">Tutoriais recomendados</div>
+          <div>${tool.tutorials.map(t=>`<a class="tutorial-link" href="${t.url}" target="_blank">▶ ${t.label}</a>`).join('')}</div>
+        </div>
+      </div>
+      <a class="site-link" href="${tool.site}" target="_blank">Acessar site oficial →</a>
+    </div>`;
+    container.appendChild(card);
+  });
+}
+function toggleCard(header){
+  const card=header.parentElement;
+  const detail=card.querySelector('.card-detail');
+  const btn=header.querySelector('.expand-btn');
+  const isOpen=detail.classList.contains('open');
+  detail.classList.toggle('open');
+  card.classList.toggle('expanded');
+  btn.textContent=isOpen?'▼':'▲';
+}
+function filterSector(sector,btn){
+  activeSector=sector;
+  document.querySelectorAll('.filter-btn:not(.student-filter)').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+function filterStudent(btn){
+  studentOnly=!studentOnly;
+  btn.classList.toggle('active');
+  renderCards();
+}
+function filterSearch(val){
+  searchQuery=val.toLowerCase().trim();
+  renderCards();
+}
+renderCards();
+</script>
+</body>
+</html>
